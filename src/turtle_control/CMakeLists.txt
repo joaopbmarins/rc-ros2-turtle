@@ -10,12 +10,14 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(turtlesim REQUIRED)
+
 
 add_executable(send_msg src/send_msg.cpp)
 ament_target_dependencies(send_msg rclcpp std_msgs)
 
 add_executable(turtle src/turtle.cpp)
-ament_target_dependencies(turtle rclcpp std_msgs geometry_msgs)
+ament_target_dependencies(turtle rclcpp std_msgs geometry_msgs turtlesim)
 
 install(TARGETS
   send_msg
