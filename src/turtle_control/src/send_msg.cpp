@@ -17,7 +17,7 @@ class Send_msg : public rclcpp::Node
   public:
     Send_msg() : Node("send_msg")
     {
-      publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);
+      publisher_ = this->create_publisher<std_msgs::msg::String>("/turtle_control", 10);
       timer_ = this->create_wall_timer(500ms, std::bind(&Send_msg::timer_callback, this));
 
       thread_teclado_ = std::thread(&Send_msg::read_keyboard, this);
