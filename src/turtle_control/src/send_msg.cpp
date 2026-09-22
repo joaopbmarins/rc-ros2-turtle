@@ -19,14 +19,17 @@ public:
     {
         publisher_ = this->create_publisher<std_msgs::msg::String>("/turtle_control", 10);
         timer_ = this->create_wall_timer(500ms, std::bind(&Send_msg::timer_callback, this));
-
+        
+        running_ = true;
         thread_teclado_ = std::thread(&Send_msg::read_keyboard, this);
     }
     ~Send_msg()
     {
+        running_ = false;
+
         if (thread_teclado_.joinable())
         {
-            thread_teclado_.detach();
+            thread_teclado_.join();
         }
     }
 
@@ -34,10 +37,23 @@ private:
     void read_keyboard()
     {
         std::string input;
-        while (rclcpp::ok())
+
+        while (running_)
         {
-            std::cout << "Digite um comando para o ROS2: ";
-            std::cin >> input;
+            std::cout << "Digite um comando para o ROS2: " << std::flush;
+
+            if (!(std::cin >> input))
+            {
+                running_ = false;
+                break;
+            }
+
+            if (input == "exit")
+            {
+                running_ = false;
+                rclcpp::shutdown();
+                break;
+            }
 
             {
                 std::lock_guard<std::mutex> lock(mutex_dados_);
@@ -61,6 +77,8 @@ private:
             publisher_->publish(message);
         }
     }
+    bool running_;
+
     std::thread thread_teclado_;
     std::string comando_atual_;
     std::mutex mutex_dados_;
